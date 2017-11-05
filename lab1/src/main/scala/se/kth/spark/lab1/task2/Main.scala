@@ -1,5 +1,6 @@
 package se.kth.spark.lab1.task2
 
+import org.apache.spark.sql.functions.{min, max}
 import se.kth.spark.lab1._
 import org.apache.spark.ml.feature.RegexTokenizer
 import org.apache.spark.ml.Pipeline
@@ -47,13 +48,22 @@ object Main {
     val lSlicer = vectorDf.withColumn("label", headValue(vectorDf("vector")))
 
     lSlicer.show(5)
+    lSlicer.printSchema()
 
     //Step5: convert type of the label from vector to double (use our Vector2Double)
-    val v2d = new Vector2DoubleUDF(???)
-    ???
-    //Step6: shift all labels by the value of minimum label such that the value of the smallest becomes 0 (use our DoubleUDF) 
-    val lShifter = new DoubleUDF(???)
-    ???
+    // It is already double?
+    //val v2d = new Vector2DoubleUDF(???)
+    //???
+
+    //Step6: shift all labels by the value of minimum label such that the value of the smallest becomes 0 (use our DoubleUDF)
+    val minYear = lSlicer.agg(min(lSlicer.col("label"))).map(r => r.getDouble(0)).head
+    val shift = (year: Double) => year - minYear
+    val lShifter = new DoubleUDF(shift)
+    lShifter.setInputCol("label")
+    lShifter.setOutputCol("shifted_label")
+    val yearShifted = lShifter.transform(lSlicer)
+
+    yearShifted.show(5)
     //Step7: extract just the 3 first features in a new vector column
     val fSlicer = ???
 
@@ -63,7 +73,7 @@ object Main {
     //Step9: generate model by fitting the rawDf into the pipeline
     val pipelineModel = pipeline.fit(rawDF)
 
-    //Step10: transform data with the model - do predictions
+    //Step10: transform data with the model
     ???
 
     //Step11: drop all columns from the dataframe other than label and features
