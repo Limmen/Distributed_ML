@@ -6,6 +6,8 @@ version := "1.0"
 
 scalaVersion := "2.11.1"
 
+javaOptions in run += "-Xms4048m -Xmx8048m -XX:ReservedCodeCacheSize=512m -XX:MaxMetaspaceSize=2048m"
+
 //resolvers += Resolver.mavenLocal
 resolvers += "Kompics Snapshots" at "http://kompics.sics.se/maven/snapshotrepository/"
 

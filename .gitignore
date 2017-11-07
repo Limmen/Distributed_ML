@@ -1,6 +1,9 @@
 *.class
 *.log
 
+*.ensime_cache
+*.ensime
+
 .DS_Store
 
 /out
@@ -34,3 +37,4 @@ project/target/
 target/
 .scala_dependencies
 .worksheet
+*spark.log
