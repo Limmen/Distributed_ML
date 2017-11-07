@@ -31,7 +31,7 @@ object Helper {
 }
 
 class MyLinearRegressionImpl(override val uid: String)
-    extends MyLinearRegression[Vector, MyLinearRegressionImpl, MyLinearModelImpl] {
+  extends MyLinearRegression[Vector, MyLinearRegressionImpl, MyLinearModelImpl] {
 
   def this() = this(Identifiable.randomUID("mylReg"))
 
@@ -77,9 +77,9 @@ class MyLinearRegressionImpl(override val uid: String)
 
     val instances: RDD[Instance] = dataset.select(
       col($(labelCol)), col($(featuresCol))).rdd.map {
-        case Row(label: Double, features: Vector) =>
-          Instance(label, features)
-      }
+      case Row(label: Double, features: Vector) =>
+        Instance(label, features)
+    }
 
     val (weights, trainingError) = linregGradientDescent(instances, numIters)
     new MyLinearModelImpl(uid, weights, trainingError)
@@ -87,7 +87,7 @@ class MyLinearRegressionImpl(override val uid: String)
 }
 
 class MyLinearModelImpl(override val uid: String, val weights: Vector, val trainingError: Array[Double])
-    extends MyLinearModel[Vector, MyLinearModelImpl] {
+  extends MyLinearModel[Vector, MyLinearModelImpl] {
 
   override def copy(extra: ParamMap): MyLinearModelImpl = defaultCopy(extra)
 

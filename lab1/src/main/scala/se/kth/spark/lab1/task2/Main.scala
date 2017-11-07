@@ -1,13 +1,14 @@
 package se.kth.spark.lab1.task2
 
-import org.apache.spark.sql.functions.{min, max}
+import org.apache.spark.sql.functions.{max, min}
 import se.kth.spark.lab1._
-import org.apache.spark.ml.feature.RegexTokenizer
-import org.apache.spark.ml.Pipeline
+import org.apache.spark.ml.linalg.Vector
+import org.apache.spark.ml.feature.{RegexTokenizer, VectorSlicer}
+import org.apache.spark.ml.{Pipeline, Transformer}
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
 import org.apache.spark.ml.linalg.{DenseVector, Vectors}
-import org.apache.spark.sql.SQLContext
+import org.apache.spark.sql.{DataFrame, SQLContext}
 
 object Main {
   def main(args: Array[String]) {
@@ -16,13 +17,33 @@ object Main {
     val sqlContext = new SQLContext(sc)
 
     import sqlContext.implicits._
-    import sqlContext._
-    import org.apache.spark.sql.functions.udf
 
     val filePath = "src/main/resources/millionsong.txt"
     val rawDF = sc.textFile(filePath).toDF("raw").cache()
 
-    rawDF.printSchema()
+    rawDF.show(5)
+
+
+
+    //fSliced.show(5)
+
+    //Step8: put everything together in a pipeline
+    val pipeline = new Pipeline().setStages(arrayOfFeatureTransforms(sqlContext,rawDF, "features"))
+
+    //Step9: generate model by fitting the rawDf into the pipeline
+    val pipelineModel = pipeline.fit(rawDF)
+
+    //Step10: transform data with the model
+    val data = pipelineModel.transform(rawDF)
+
+    //Step11: drop all columns from the dataframe other than label and features
+    val cleanData = data.drop("raw", "parsed", "vector", "label", "label_double").toDF(Seq("label", "features"): _*)
+
+    cleanData.show(5)
+  }
+
+  def arrayOfFeatureTransforms(sqlContext: SQLContext ,rawDf: DataFrame, featureColName: String): Array[Transformer] = {
+    import sqlContext.implicits._
 
     //Step1: tokenize each row
     val regexTokenizer = new RegexTokenizer()
@@ -31,52 +52,50 @@ object Main {
       .setPattern(",")
 
     //Step2: transform with tokenizer and show 5 rows
-    val transformed = regexTokenizer.transform(rawDF).drop("raw")
+    //val transformed = regexTokenizer.transform(rawDF).drop("raw")
 
-    transformed.show(5)
+    //transformed.show(5)
 
     //Step3: transform array of tokens to a vector of tokens (use our ArrayToVector)
     val arr2Vect = new Array2Vector()
     arr2Vect.setInputCol("parsed")
     arr2Vect.setOutputCol("vector")
-    val vectorDf = arr2Vect.transform(transformed).drop("parsed")
+    //val vectorDf = arr2Vect.transform(transformed).drop("parsed")
 
-    vectorDf.printSchema()
+    //vectorDf.printSchema()
 
-    val headValue = udf((arr: DenseVector) => arr.values(0))
     //Step4: extract the label(year) into a new column
-    val lSlicer = vectorDf.withColumn("label", headValue(vectorDf("vector")))
+    val lSlicer = new VectorSlicer().setInputCol("vector").setOutputCol("label_vec")
+    lSlicer.setIndices(Array(0))
 
-    lSlicer.show(5)
-    lSlicer.printSchema()
+    //lSliced.show(5)
+    //lSliced.printSchema()
 
     //Step5: convert type of the label from vector to double (use our Vector2Double)
     // It is already double?
-    //val v2d = new Vector2DoubleUDF(???)
-    //???
+    val vec2Double = (vec: Vector) => vec(0)
+    val v2d = new Vector2DoubleUDF(vec2Double)
+    v2d.setInputCol("label_vec")
+    v2d.setOutputCol("label_double")
+    //val labelAsDouble = v2d.transform(lSliced)
+
+    //labelAsDouble.show(5)
 
     //Step6: shift all labels by the value of minimum label such that the value of the smallest becomes 0 (use our DoubleUDF)
-    val minYear = lSlicer.agg(min(lSlicer.col("label"))).map(r => r.getDouble(0)).head
+    val minYear = rawDf.agg(min(rawDf.col("raw"))).map(r => r.getString(0).split(",")(0).toDouble).head
     val shift = (year: Double) => year - minYear
     val lShifter = new DoubleUDF(shift)
-    lShifter.setInputCol("label")
-    lShifter.setOutputCol("shifted_label")
-    val yearShifted = lShifter.transform(lSlicer)
+    lShifter.setInputCol("label_double")
+    lShifter.setOutputCol("label")
+    //val yearShifted = lShifter.transform(labelAsDouble)
 
-    yearShifted.show(5)
+    //yearShifted.show(5)
     //Step7: extract just the 3 first features in a new vector column
-    val fSlicer = ???
+    //val first3Features = udf((arr: DenseVector) => Vectors.dense(arr(1), arr(2), arr(3)))
+    //val fSlicer = yearShifted.withColumn("features", first3Features(yearShifted("features")))
+    val fSlicer = new VectorSlicer().setInputCol("vector").setOutputCol(featureColName)
+    fSlicer.setIndices(Array(1,2,3))
 
-    //Step8: put everything together in a pipeline
-    val pipeline = new Pipeline().setStages(???)
-
-    //Step9: generate model by fitting the rawDf into the pipeline
-    val pipelineModel = pipeline.fit(rawDF)
-
-    //Step10: transform data with the model
-    ???
-
-    //Step11: drop all columns from the dataframe other than label and features
-    ???
+    Array(regexTokenizer, arr2Vect, lSlicer, v2d, lShifter, fSlicer)
   }
 }
