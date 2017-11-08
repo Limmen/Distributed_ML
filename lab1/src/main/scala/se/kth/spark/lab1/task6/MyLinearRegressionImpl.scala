@@ -1,32 +1,30 @@
 package se.kth.spark.lab1.task6
 
-import org.apache.spark.ml.linalg.Vector
 import org.apache.spark.ml.PredictorParams
+import org.apache.spark.ml.linalg.Vector
 import org.apache.spark.ml.param.ParamMap
 import org.apache.spark.ml.util._
-import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.Dataset
-import org.apache.spark.sql.functions._
-
-import org.apache.spark.hack._
-import org.apache.spark.sql.Row
-import org.apache.spark.ml.linalg.Vectors
-import org.apache.spark.ml.linalg.Matrices
 import org.apache.spark.mllib.evaluation.RegressionMetrics
+import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.{Row, Dataset}
+import org.apache.spark.sql.functions._
 
 case class Instance(label: Double, features: Vector)
 
 object Helper {
   def rmse(labelsAndPreds: RDD[(Double, Double)]): Double = {
-    ???
+    Math.sqrt(labelsAndPreds.map {
+      case (label, pred) =>
+        Math.pow((label - pred), 2)
+    }.sum / labelsAndPreds.count)
   }
 
   def predictOne(weights: Vector, features: Vector): Double = {
-    ???
+    VectorHelper.dot(weights, features)
   }
 
   def predict(weights: Vector, data: RDD[Instance]): RDD[(Double, Double)] = {
-    ???
+    data.map((instance) => (instance.label, predictOne(weights, instance.features)))
   }
 }
 
@@ -76,10 +74,11 @@ class MyLinearRegressionImpl(override val uid: String)
     val numIters = 100
 
     val instances: RDD[Instance] = dataset.select(
-      col($(labelCol)), col($(featuresCol))).rdd.map {
-      case Row(label: Double, features: Vector) =>
-        Instance(label, features)
-    }
+      col($(labelCol)), col($(featuresCol))
+    ).rdd.map {
+        case Row(label: Double, features: Vector) =>
+          Instance(label, features)
+      }
 
     val (weights, trainingError) = linregGradientDescent(instances, numIters)
     new MyLinearModelImpl(uid, weights, trainingError)
