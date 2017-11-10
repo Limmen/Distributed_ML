@@ -58,7 +58,7 @@ class Task6Suite extends FunSuite with Matchers with BeforeAndAfter {
     assert(predicted.length == 1)
     assert(predicted(0) == (600.0, 556.0))
   }
-  /*
+
   test("gradient summand test"){
     val mlri = new MyLinearRegressionImpl("mlri")
     assert(mlri.gradientSummand(weights = Vectors.dense(39.0, 245.0, 9.0), lp = Instance(600.0, Vectors.dense(1.0,2.0,3.0))) == Vectors.dense(-44.0,-88.0,-132.0))
@@ -68,5 +68,5 @@ class Task6Suite extends FunSuite with Matchers with BeforeAndAfter {
     val mlri = new MyLinearRegressionImpl("mlri")
     assert(mlri.gradient(d = sc.parallelize(Seq(Instance(600.0, Vectors.dense(1.0,2.0,3.0)), Instance(480.0, Vectors.dense(13.0,1.0,1.0)))), Vectors.dense(39.0, 245.0, 9.0)) == Vectors.dense(3609.0, 193.0, 149.0))
   }
- */
+
 }
