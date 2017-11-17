@@ -10,6 +10,25 @@ import org.apache.spark.ml.tuning.{CrossValidator, CrossValidatorModel, ParamGri
 import org.apache.spark.sql.{Row, SQLContext}
 import se.kth.spark.lab1.task2.{Main => MainTask2}
 
+/*
+ *
+ * Output when training with the smaller csv file and all 6 features:
+ *
+ * Start training (using all 6 features)
+ * Training done in: 235.010298526 seconds = 4 minutes
+ * numIterations: 201
+ * RMSE: 15.48973145600878
+ * r2: 0.4769790368839615
+ *
+ * Output when training with the larger csv file (500k songs) and all 6 features:
+ *
+ * Start training (using all 6 features)
+ * Training done in: 3014.769056968 seconds = 50 minutes
+ * numIterations: 201
+ * RMSE: 10.304488266843789
+ * r2: 0.1112677268884611
+ *
+ */
 object Main {
   def main(args: Array[String]) {
     val conf = new SparkConf().setAppName("lab1").setMaster("local")
@@ -19,8 +38,20 @@ object Main {
     import sqlContext.implicits._
 
     val filePath = "src/main/resources/millionsong.txt"
-    val rawDF = sc.textFile(filePath).toDF("raw").cache()
-
+    //val rawDF = sc.textFile(filePath).toDF("raw").cache()
+   // val filePath = "src/main/resources/million-song-all.txt"
+    /*
+     * Convert the larger dataset to proper format.. it was malformed with nested strings
+     */
+    val rawDF = sc.textFile(filePath).map(row => {
+      val cols = row.split(",")
+      if (cols(0).contains("\"")) {
+        cols.map(c => {
+          c.substring(1, c.size - 1).toDouble
+        }).mkString(",")
+      } else
+        row
+    }).toDF("raw").cache()
     /*
      * Transformation that expands feature vector into a polynomial space.
      * Uses n-degree combination of original dimensions.
