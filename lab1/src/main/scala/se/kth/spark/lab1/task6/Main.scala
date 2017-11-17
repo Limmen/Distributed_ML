@@ -9,6 +9,11 @@ import org.apache.spark.sql.{Row, SQLContext, DataFrame}
 import org.apache.spark.ml.PipelineModel
 import se.kth.spark.lab1.task2.{Main => MainTask2}
 
+/*
+ * Training
+ * Total time: 43 s
+ * RMSE: 19.07406004541845
+ */
 object Main {
   def main(args: Array[String]) {
     val conf = new SparkConf().setAppName("lab1").setMaster("local")
@@ -19,7 +24,11 @@ object Main {
     import sqlContext._
 
     val filePath = "src/main/resources/millionsong.txt"
+    /*
+     * Convert the larger dataset to proper format.. it was malformed with nested strings
+     */
     val rawDF = sc.textFile(filePath).toDF("raw").cache()
+
     //Our own implementation of LR estimator
     val pipelineModel: PipelineModel = getLinearRegPipeline(sqlContext, rawDF)._2.fit(rawDF)
     val lrStage = 6
