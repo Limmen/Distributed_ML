@@ -26,20 +26,20 @@ y = tf.nn.softmax(tf.matmul(XX, W) + b)
 # 3. Define the loss function
 cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(y), reduction_indices=[1]))
 # 4. Define the accuracy
-correct_predictions = tf.equal(tf.arg_max(y, 1), tf.arg_max(y_, 1))
+correct_predictions = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
 accuracy = tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
 # 5. Train with an Optimizer
 train_step = tf.train.GradientDescentOptimizer(LEARNING_RATE).minimize(cross_entropy)
 
 # initialize
-init = tf.initialize_all_variables()
+init = tf.global_variables_initializer()
 sess = tf.Session()
 sess.run(init)
 
 
 def training_step(i, update_test_data, update_train_data):
 
-    print "\r", i,
+    print(f"\r {i}")
     ####### actual learning 
     # reading batches of 100 images with 100 labels
     batch_X, batch_Y = mnist.train.next_batch(100)
@@ -101,7 +101,7 @@ plt.show()
 
 # Zoom in on the tail of the plots
 zoom_point = 50
-x_range = range(zoom_point,training_iter/epoch_size)
+x_range = range(zoom_point,int(training_iter/epoch_size))
 plt.plot(x_range, train_a[zoom_point:])
 plt.plot(x_range, test_a[zoom_point:])
 plt.grid(True)
