@@ -1,0 +1,7 @@
+## Dropout
+Final test accuracy 0.5113
+Final test loss 1.17581
+
+## Droput & Decay
+Final test accuracy 0.7413
+Final test loss 0.738529

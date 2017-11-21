@@ -1,0 +1,7 @@
+#Gradinet decent#
+Final test accuracy 0.8212
+Final test loss 0.700052
+
+# Adam #
+Final test accuracy 0.8445
+Final test loss 0.444217

@@ -1,0 +1,8 @@
+## Sigmoid ##
+Final test accuracy 0.8562
+Final test loss 0.392407
+
+## ReLU ##
+
+Final test accuracy 0.8807
+Final test loss 0.346351

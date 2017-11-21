@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 # 70k mnist dataset that comes with the tensorflow container
 from tensorflow.examples.tutorials.mnist import input_data
 
-tf.set_random_seed(0)
+#tf.set_random_seed(0)
 
 IMAGE_SIZE = 28
 IMAGE_PIXELS = IMAGE_SIZE * IMAGE_SIZE
@@ -14,6 +14,9 @@ NUM_CLASSES = 10
 LEARNING_RATE = 0.5
 # load data
 mnist = input_data.read_data_sets('data/fashion', one_hot=True)
+
+print 'Number of train examples in dataset ' + str(len(mnist.train.labels))
+print 'Number of test examples in dataset ' + str(len(mnist.test.labels))
 
 X = tf.placeholder(tf.float32, [None, IMAGE_SIZE, IMAGE_SIZE, 1])
 y_ = tf.placeholder(tf.float32, [None, NUM_CLASSES]) # correct answers(labels)
@@ -39,7 +42,7 @@ sess.run(init)
 
 def training_step(i, update_test_data, update_train_data):
 
-    print(f"\r {i}")
+    #print 'Iter ' + str(i)
     ####### actual learning 
     # reading batches of 100 images with 100 labels
     batch_X, batch_Y = mnist.train.next_batch(100)
@@ -87,27 +90,37 @@ for i in range(training_iter):
 
 # 7. Plot and visualise the accuracy and loss
 
+print 'Final test accuracy ' + str(test_a[-1])
+print 'Final test loss ' + str(test_c[-1])
+
 # accuracy training vs testing dataset
-plt.plot(train_a)
-plt.plot(test_a)
+plt.plot(train_a, label='Train data')
+plt.xlabel('Epoch')
+plt.plot(test_a, label='Test data')
+plt.ylabel('Accuracy')
 plt.grid(True)
+plt.legend()
+plt.title('Accuracy train vs test')
 plt.show()
 
 # loss training vs testing dataset
-plt.plot(train_c)
-plt.plot(test_c)
+plt.plot(train_c, label='Train data')
+plt.plot(test_c, label='Test data')
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.legend()
 plt.grid(True)
 plt.show()
 
-# Zoom in on the tail of the plots
-zoom_point = 50
-x_range = range(zoom_point,int(training_iter/epoch_size))
-plt.plot(x_range, train_a[zoom_point:])
-plt.plot(x_range, test_a[zoom_point:])
-plt.grid(True)
-plt.show()
-
-plt.plot(train_c[zoom_point:])
-plt.plot(test_c[zoom_point:])
-plt.grid(True)
-plt.show()
+# # Zoom in on the tail of the plots
+# zoom_point = 50
+# x_range = range(zoom_point,int(training_iter/epoch_size))
+# plt.plot(x_range, train_a[zoom_point:])
+# plt.plot(x_range, test_a[zoom_point:])
+# plt.grid(True)
+# plt.show()
+#
+# plt.plot(train_c[zoom_point:])
+# plt.plot(test_c[zoom_point:])
+# plt.grid(True)
+# plt.show()

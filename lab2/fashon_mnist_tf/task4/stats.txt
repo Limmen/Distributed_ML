@@ -1,0 +1,5 @@
+## Adam without droput
+Final test accuracy 0.8628
+Final test loss 0.380374
+
+#
