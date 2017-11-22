@@ -1,4 +1,4 @@
-#Gradinet decent#
+# Gradient decent #
 Final test accuracy 0.8212
 Final test loss 0.700052
 

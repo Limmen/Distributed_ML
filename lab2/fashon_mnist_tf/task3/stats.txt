@@ -1,7 +1,16 @@
-## Dropout
-Final test accuracy 0.5113
-Final test loss 1.17581
+Base learning rate: 0.5
+Decay: 0.96 decay every 50 samples
+Dropout-prob: 0.1
+Dropout-layer: first only (more layers gave worse results) (underfitting)
 
-## Droput & Decay
-Final test accuracy 0.7413
-Final test loss 0.738529
+# No decay & No dropout
+Final test accuracy 0.1
+Final test loss nan
+
+# Decay & No dropout
+Final test accuracy 0.8745
+Final test loss 0.346231
+
+# Decay & dropout
+Final test accuracy 0.6761
+Final test loss 0.808773
