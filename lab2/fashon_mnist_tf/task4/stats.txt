@@ -1,5 +1,64 @@
-## Adam without droput
-Final test accuracy 0.8628
-Final test loss 0.380374
+# Constants
 
-#
+DROPOUT_RATE = 0.1
+GD_LEARNING_RATE = 0.5
+ADAM_LEARNING_RATE = 0.005
+
+# Task 1 : Gradient Descent without Dropout & learning rate decay
+
+Final test accuracy 0.8709
+Final test loss 0.432495
+
+# Task 2 : Adam without Dropout & learning rate decay
+
+Final test accuracy 0.8927
+Final test loss 0.50648
+
+# Task 3 : Adam with learning rate decay & without Dropout
+
+Starting rate: 0.005
+Decay every 500 steps
+Decay rate: 0.96
+
+Final test accuracy 0.897
+Final test loss 0.508396
+
+# Task 3 : Gradient Descent with learning rate decay & without Dropout
+
+Starting rate: 0.5
+Decay every 500 steps
+Decay rate: 0.96
+
+Final test accuracy 0.8834
+Final test loss 0.422015
+
+# Task 4 : Adam with learning rate decay & with Dropout
+
+Dropout rate=0.5 all layers
+
+Final test accuracy 0.8203
+Final test loss 0.484211
+
+Dropout rate=0.1 all layers
+Final test accuracy 0.3242
+Final test loss 1.67373
+
+Dropout rate=0.1 fc layer only
+
+Final test accuracy 0.816
+Final test loss 0.524715
+
+Dropout rate=0.5 fc layer only
+
+Final test accuracy 0.894
+Final test loss 0.343343
+
+Dropout rate=0.5 fc layer and third conv layer
+
+Final test accuracy 0.8616
+Final test loss 0.386244
+
+Dropout rate=0.5 fc layer and 0.1 third conv layer
+
+Final test accuracy 0.7538
+Final test loss 0.6581444
