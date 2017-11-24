@@ -94,19 +94,19 @@ correct_predictions = tf.equal(tf.argmax(logits, 1), tf.argmax(y_, 1))
 accuracy = tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
 
 # Exponential decay of learning rate
-#global_step = tf.Variable(0, trainable=False)
-#starter_learning_rate = ADAM_LEARNING_RATE
-#learning_rate = tf.train.exponential_decay(starter_learning_rate, global_step, 500, 0.96, staircase=True)
+global_step = tf.Variable(0, trainable=False)
+starter_learning_rate = ADAM_LEARNING_RATE
+learning_rate = tf.train.exponential_decay(starter_learning_rate, global_step, 500, 0.96, staircase=True)
 
 # 5. Train with an Optimizer
 # task 1
-train_step = tf.train.GradientDescentOptimizer(GD_LEARNING_RATE).minimize(cross_entropy_loss)
+#train_step = tf.train.GradientDescentOptimizer(GD_LEARNING_RATE).minimize(cross_entropy_loss)
 
 # task 2
 #train_step = tf.train.AdamOptimizer(ADAM_LEARNING_RATE).minimize(cross_entropy_loss)
 
 # task 3
-#train_step = tf.train.AdamOptimizer(learning_rate).minimize(cross_entropy_loss, global_step=global_step)
+train_step = tf.train.AdamOptimizer(learning_rate).minimize(cross_entropy_loss, global_step=global_step)
 
 # initialize and run start operation
 init = tf.global_variables_initializer()
@@ -153,7 +153,7 @@ train_cost = []
 test_accuracy = []
 test_cost = []
 
-NUM_TRAINING_ITER = 1000
+NUM_TRAINING_ITER = 10000
 NUM_EPOCH_SIZE = 100
 for i in range(NUM_TRAINING_ITER):
     test = False

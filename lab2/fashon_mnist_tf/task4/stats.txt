@@ -1,5 +1,10 @@
-## Adam without droput
-Final test accuracy 0.8628
-Final test loss 0.380374
+Adam learning rate: 0.005
 
-#
+# Adam without dropout, without decay
+Final test accuracy 0.8927
+Final test loss 0.50648
+
+# Adam without dropout, with decay
+Final test accuracy 0.897
+Final test loss 0.508396
+
