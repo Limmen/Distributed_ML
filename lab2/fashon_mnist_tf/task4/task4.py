@@ -113,7 +113,7 @@ h_conv3_flat = tf.reshape(h_conv3, [-1, 7 * 7 * 12])
 
 # Hidden FC layer output
 h_fc1 = tf.nn.relu(tf.matmul(h_conv3_flat, W_fc) + b_fc)
-h_fc1 = tf.nn.dropout(h_fc1, keep_prob=0.6)
+h_fc1 = tf.nn.dropout(h_fc1, keep_prob=0.5)
 
 # Readout/Softmax layer
 
