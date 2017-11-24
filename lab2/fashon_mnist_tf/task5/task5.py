@@ -7,6 +7,7 @@ from __future__ import print_function
 import tensorflow as tf
 # to visualize the resutls
 import matplotlib.pyplot as plt
+import numpy as np
 # 70k mnist dataset that comes with the tensorflow container
 from tensorflow.examples.tutorials.mnist import input_data
 
@@ -196,9 +197,20 @@ def training_step(update_test_data, update_train_data, images, labels, training_
 
 # 6. Train and test the model, store the accuracy and loss per iteration
 
-def hype():
+def hype_grid():
     learning_rates = [0.0001, 0.001, 0.003, 0.05, 0.03]
     dropout_rates = [0.1, 0.2, 0.3, 0.6, 0.8]
+
+    for learning_rate in learning_rates:
+        for dropout_rate in dropout_rates:
+            print("Trying following " + str(learning_rate) + " learning rate and " + str(dropout_rate) + ' dropout rate')
+            test_accuracy = main(learning_rate, dropout_rate)
+            print('Test accuracy ' + str(test_accuracy[-1]))
+
+
+def hype_random():
+    learning_rates = np.random.uniform(0.0001, 0.03, 10).tolist()
+    dropout_rates = np.random.uniform(0.1, 0.8, 10).tolist()
 
     for learning_rate in learning_rates:
         for dropout_rate in dropout_rates:
@@ -281,4 +293,4 @@ def plot(train_accuracy, train_cost, test_accuracy, test_cost):
     plt.show()
 
 
-hype()
+hype_random()
