@@ -1,4 +1,6 @@
 Adam learning rate: 0.005
+Gd learning rate: 0.5
+Decay: 0.96 every 500 iter
 
 # Adam without dropout, without decay
 Final test accuracy 0.8927
@@ -8,3 +10,10 @@ Final test loss 0.50648
 Final test accuracy 0.897
 Final test loss 0.508396
 
+# gd-no-deacy-no-reg
+Final test accuracy 0.1282
+Final test loss 2.214514
+
+# adam-decay-reg
+Final test accuracy 0.8882
+Final test loss 0.354514

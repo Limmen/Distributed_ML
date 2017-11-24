@@ -113,7 +113,7 @@ h_conv3_flat = tf.reshape(h_conv3, [-1, 7 * 7 * 12])
 
 # Hidden FC layer output
 h_fc1 = tf.nn.relu(tf.matmul(h_conv3_flat, W_fc) + b_fc)
-h_fc1 = tf.nn.dropout(h_fc1, keep_prob=0.6)
+h_fc1 = tf.nn.dropout(h_fc1, keep_prob=0.5)
 
 # Readout/Softmax layer
 
@@ -130,11 +130,7 @@ cross_entropy_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labe
 correct_predictions = tf.equal(tf.argmax(logits, 1), tf.argmax(y_, 1))
 accuracy = tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
 
-<<<<<<< HEAD:lab2/fashon_mnist_tf/task4_old/task4.py
 # Exponential decay of learning rate
-=======
-# Exponential decay of learning rate (task 3)
->>>>>>> f6ccdf72f9d9101196d938a9cdff5de4ac2578be:lab2/fashon_mnist_tf/task4/task4.py
 global_step = tf.Variable(0, trainable=False)
 starter_learning_rate = ADAM_LEARNING_RATE
 learning_rate = tf.train.exponential_decay(starter_learning_rate, global_step, 500, 0.96, staircase=True)
@@ -149,10 +145,6 @@ learning_rate = tf.train.exponential_decay(starter_learning_rate, global_step, 5
 
 # task 3
 train_step = tf.train.AdamOptimizer(learning_rate).minimize(cross_entropy_loss, global_step=global_step)
-<<<<<<< HEAD:lab2/fashon_mnist_tf/task4_old/task4.py
-=======
-#train_step = tf.train.GradientDescentOptimizer(learning_rate).minimize(cross_entropy_loss, global_step=global_step)
->>>>>>> f6ccdf72f9d9101196d938a9cdff5de4ac2578be:lab2/fashon_mnist_tf/task4/task4.py
 
 # initialize and run start operation
 init = tf.global_variables_initializer()
