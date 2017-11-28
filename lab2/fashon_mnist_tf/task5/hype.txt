@@ -200,3 +200,7 @@ Test accuracy 0.8382
 Best accuracy:
 Trying following 0.0115649014129 learning rate and 0.709008503773 dropout rate
 Test accuracy 0.8602
+
+Stats with found hyperparameters:
+Final test accuracy 0.8836
+Final test loss 0.362781

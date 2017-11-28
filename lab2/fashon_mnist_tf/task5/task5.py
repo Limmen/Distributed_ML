@@ -27,7 +27,7 @@ tf.set_random_seed(0)
 IMAGE_SIZE = 28
 IMAGE_PIXELS = IMAGE_SIZE * IMAGE_SIZE
 NUM_CLASSES = 10
-NUM_TRAINING_ITER = 1000
+NUM_TRAINING_ITER = 10000
 NUM_EPOCH_SIZE = 100
 NUM_HIDDEN_1 = 200
 NUM_HIDDEN_2 = 100
@@ -243,12 +243,14 @@ def main(learning_rate, dropout_rate):
         test = False
         if i % NUM_EPOCH_SIZE == 0:
             test = True
-            #print("iter: " + str(i))
+            print("iter: " + str(i))
         a, c, ta, tc = training_step(test, test, images, labels, training_step_tf, accuracy, cross_entropy_loss, sess)
         train_accuracy += a
         train_cost += c
         test_accuracy += ta
         test_cost += tc
+
+    plot(train_accuracy, train_cost, test_accuracy, test_cost)
 
     sess.close()
 
@@ -302,4 +304,5 @@ def plot(train_accuracy, train_cost, test_accuracy, test_cost):
     plt.show()
 
 
-hype_random()
+#hype_random()
+main(learning_rate=0.0115649014129, dropout_rate=0.709008503773)
