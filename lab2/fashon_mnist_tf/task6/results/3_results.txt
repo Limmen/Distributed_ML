@@ -1,0 +1,3 @@
+Results for: 3
+Test accuracy 0.8274
+Test accuracy 0.8266

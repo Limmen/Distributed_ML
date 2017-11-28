@@ -2,6 +2,10 @@
 Final test accuracy 0.8212
 Final test loss 0.700052
 
-# Adam #
-Final test accuracy 0.8445
-Final test loss 0.444217
+# Adam 0.0005 #
+Final test accuracy 0.8447
+Final test loss 0.446822
+
+# Adam 0.005 #
+Final test accuracy 0.1
+Final test loss nan

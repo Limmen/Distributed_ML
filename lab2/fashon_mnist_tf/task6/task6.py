@@ -1,58 +1,54 @@
+# Task 5 - Hyperparameter tuning
+
 from __future__ import print_function
 
 # all tensorflow api is accessible through this
 import tensorflow as tf
+import os
 # to visualize the resutls
 import matplotlib.pyplot as plt
-import pandas as pd
+import numpy as np
+# 70k mnist dataset that comes with the tensorflow container
+from tensorflow.examples.tutorials.mnist import input_data
 from pyspark.context import SparkContext
 from pyspark.conf import SparkConf
 from tensorflowonspark import TFCluster, TFNode
-from datetime import datetime
 from tensorflow.examples.tutorials.mnist import input_data
 
-def main_fun(argv, ctx):
 # Enable deterministic comparisons between executions
-    tf.set_random_seed(0)
+tf.set_random_seed(0)
+# constants
+IMAGE_SIZE = 28
+IMAGE_PIXELS = IMAGE_SIZE * IMAGE_SIZE
+NUM_CLASSES = 10
+NUM_TRAINING_ITER = 500
+NUM_EPOCH_SIZE = 100
+NUM_HIDDEN_1 = 200
+NUM_HIDDEN_2 = 100
+NUM_HIDDEN_3 = 60
+NUM_HIDDEN_4 = 30
+GD_LEARNING_RATE = 0.5
 
-    # constants
-    IMAGE_SIZE = 28
-    IMAGE_PIXELS = IMAGE_SIZE * IMAGE_SIZE
-    NUM_CLASSES = 10
-    NUM_HIDDEN_1 = 200
-    NUM_HIDDEN_2 = 100
-    NUM_HIDDEN_3 = 60
-    NUM_HIDDEN_4 = 30
-    DROPOUT_RATE = 0.5
-    GD_LEARNING_RATE = 0.5
-    ADAM_LEARNING_RATE = 0.005
 
-    # load data
-    mnist = input_data.read_data_sets('/home/limmen/workspace/scala/ID2223-Scalable-ML/lab2/fashon_mnist_tf/data/fashion', one_hot=True, validation_size=0)
-
-    print('Number of train examples in dataset ' + str(len(mnist.train.labels)))
-    print('Number of test examples in dataset ' + str(len(mnist.test.labels)))
-
+def define_placeholders():
     # Define placeholders for input data and for input truth labels
     x = tf.reshape(tf.placeholder(tf.float32, [None, IMAGE_SIZE, IMAGE_SIZE, 1]),
                    [-1, IMAGE_PIXELS])  # training examples (just one color channel, i.e grayscale)
     y_ = tf.placeholder(tf.float32, [None, NUM_CLASSES])  # correct answers(labels)
 
+    return x, y_
 
-    # Define variables for the parameters of the model: Weights and biases, random-initialization with gaussian dist.
-    # For each convolutional layer specify patch size, input channels and output channels
 
+def build_graph(x, dropout_rate):
     # Helper function for weight variables, random gaussian weight initialization with 0 mean.
     def weight_variable(shape):
         initial = tf.truncated_normal(shape, stddev=0.1)
         return tf.Variable(initial)
 
-
     # Helper function for bias variables, random gaussian weight initialization with 0 mean.
     def bias_variable(shape):
         initial = tf.constant(0.1, shape=shape)
         return tf.Variable(initial)
-
 
     # Helper function for convolutional layers with specified input size, stride
     # conv2d performs 2D convolution on 4D input, if input is 5D one can use 3D convolution
@@ -61,8 +57,7 @@ def main_fun(argv, ctx):
     def conv2d(x, W, stride):
         return tf.nn.conv2d(x, W, strides=stride, padding='SAME')
 
-
-    x_image = tf.reshape(x, [-1, 28, 28, 1]) # [numImages, height, width, channels]
+    x_image = tf.reshape(x, [-1, 28, 28, 1])  # [numImages, height, width, channels]
 
     # Layer 1 - Convolutional, 5x5 patch strided 1 pixel at a time over the input,
     # 1 input channel of size 28x28,
@@ -104,115 +99,175 @@ def main_fun(argv, ctx):
 
     # hidden layers with relu, 3 convolutional layer and 1 FC layer
     h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1, [1, 1, 1, 1]) + b_conv1)
-    #h_conv1 = tf.nn.dropout(h_conv1, keep_prob=DROPOUT_RATE)
+    # h_conv1 = tf.nn.dropout(h_conv1, keep_prob=DROPOUT_RATE)
 
     h_conv2 = tf.nn.relu(conv2d(h_conv1, W_conv2, [1, 2, 2, 1]) + b_conv2)
-    #h_conv2 = tf.nn.dropout(h_conv2, keep_prob=DROPOUT_RATE)
+    # h_conv2 = tf.nn.dropout(h_conv2, keep_prob=DROPOUT_RATE)
 
     h_conv3 = tf.nn.relu(conv2d(h_conv2, W_conv3, [1, 2, 2, 1]) + b_conv3)
-    #h_conv3 = tf.nn.dropout(h_conv3, keep_prob=DROPOUT_RATE)
+    # h_conv3 = tf.nn.dropout(h_conv3, keep_prob=DROPOUT_RATE)
     h_conv3_flat = tf.reshape(h_conv3, [-1, 7 * 7 * 12])
 
     # Hidden FC layer output
     h_fc1 = tf.nn.relu(tf.matmul(h_conv3_flat, W_fc) + b_fc)
-    h_fc1 = tf.nn.dropout(h_fc1, keep_prob=0.6)
+    h_fc1 = tf.nn.dropout(h_fc1, keep_prob=dropout_rate)
 
     # Readout/Softmax layer
 
     # Compute the logits, aka the inverse of the sigmoid/softmax outputs for the softmax layer
     logits = tf.matmul(h_fc1, W_fc2) + b_fc2
 
+    return logits
+
+
+def define_optimizer(learning_rate, logits, labels):
     # Define the loss, which is the loss between softmax of logits and the labels
     # Tensorflow performs softmax (the output activation) as part of the loss for efficiency
-    cross_entropy_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=y_, logits=logits, name='xentropy'))
+    cross_entropy_loss = tf.reduce_mean(
+        tf.nn.softmax_cross_entropy_with_logits(labels=labels, logits=logits, name='xentropy'))
 
     # 4. Define the accuracy
     # Correct prediction is black/white, either the classification is correct or not
     # Accuracy is the ratio of correct predictions over wrong predictions
-    correct_predictions = tf.equal(tf.argmax(logits, 1), tf.argmax(y_, 1))
+    correct_predictions = tf.equal(tf.argmax(logits, 1), tf.argmax(labels, 1))
     accuracy = tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
 
     # Exponential decay of learning rate (task 3)
     global_step = tf.Variable(0, trainable=False)
-    starter_learning_rate = ADAM_LEARNING_RATE
+    starter_learning_rate = learning_rate
     learning_rate = tf.train.exponential_decay(starter_learning_rate, global_step, 500, 0.96, staircase=True)
 
     # 5. Train with an Optimizer
 
     # task 1
-    #train_step = tf.train.GradientDescentOptimizer(GD_LEARNING_RATE).minimize(cross_entropy_loss)
+    # train_step = tf.train.GradientDescentOptimizer(GD_LEARNING_RATE).minimize(cross_entropy_loss)
 
     # task 2
-    #train_step = tf.train.AdamOptimizer(ADAM_LEARNING_RATE).minimize(cross_entropy_loss)
+    # train_step = tf.train.AdamOptimizer(ADAM_LEARNING_RATE).minimize(cross_entropy_loss)
 
     # task 3
     train_step = tf.train.AdamOptimizer(learning_rate).minimize(cross_entropy_loss, global_step=global_step)
-    #train_step = tf.train.GradientDescentOptimizer(learning_rate).minimize(cross_entropy_loss, global_step=global_step)
+    # train_step = tf.train.GradientDescentOptimizer(learning_rate).minimize(cross_entropy_loss, global_step=global_step)
 
+    return train_step, accuracy, cross_entropy_loss
+
+
+def init_graph():
     # initialize and run start operation
     init = tf.global_variables_initializer()
     sess = tf.Session()
     sess.run(init)
 
-
-    # Function representing a single iteration during training.
-    # Returns a tuple of accuracy and loss statistics.
-    def training_step(i, update_test_data, update_train_data):
-        # actual learning
-        # reading batches of 100 images with 100 labels
-        batch_X, batch_Y = mnist.train.next_batch(100)
-        # the backpropagation training step
-        sess.run(train_step, feed_dict={x: batch_X, y_: batch_Y})
-
-        # evaluating model performance for printing purposes
-        # evaluation used to later visualize how well you did at a particular time in the training
-        train_a = []  # Array of training-accuracy for a single iteration
-        train_c = []  # Array of training-cost for a single iteration
-        test_a = []  # Array of test-accuracy for a single iteration
-        test_c = []  # Array of test-cost for a single iteration
-
-        # If stats for train-data should be updates, compute loss and accuracy for the batch and store it
-        if update_train_data:
-            train_acc, train_cos = sess.run([accuracy, cross_entropy_loss], feed_dict={x: batch_X, y_: batch_Y})
-            train_a.append(train_acc)
-            train_c.append(train_cos)
-
-        # If stats for test-data should be updates, compute loss and accuracy for the batch and store it
-        if update_test_data:
-            test_acc, test_cos = sess.run([accuracy, cross_entropy_loss],
-                                          feed_dict={x: mnist.test.images, y_: mnist.test.labels})
-            test_a.append(test_acc)
-            test_c.append(test_cos)
-
-        return train_a, train_c, test_a, test_c
+    return sess
 
 
-    # 6. Train and test the model, store the accuracy and loss per iteration
+# Function representing a single iteration during training.
+# Returns a tuple of accuracy and loss statistics.
+def training_step(update_test_data, update_train_data, images, labels, training_step, accuracy, cross_entropy_loss,
+                  sess, mnist):
+    # actual learning
+    # reading batches of 100 images with 100 labels
+    batch_X, batch_Y = mnist.train.next_batch(100)
+    # the backpropagation training step
+    sess.run(training_step, feed_dict={images: batch_X, labels: batch_Y})
 
+    # evaluating model performance for printing purposes
+    # evaluation used to later visualize how well you did at a particular time in the training
+    train_a = []  # Array of training-accuracy for a single iteration
+    train_c = []  # Array of training-cost for a single iteration
+    test_a = []  # Array of test-accuracy for a single iteration
+    test_c = []  # Array of test-cost for a single iteration
+
+    # If stats for train-data should be updates, compute loss and accuracy for the batch and store it
+    if update_train_data:
+        train_acc, train_cos = sess.run([accuracy, cross_entropy_loss], feed_dict={images: batch_X, labels: batch_Y})
+        train_a.append(train_acc)
+        train_c.append(train_cos)
+
+    # If stats for test-data should be updates, compute loss and accuracy for the batch and store it
+    if update_test_data:
+        test_acc, test_cos = sess.run([accuracy, cross_entropy_loss],
+                                      feed_dict={images: mnist.test.images, labels: mnist.test.labels})
+        test_a.append(test_acc)
+        test_c.append(test_cos)
+
+    return train_a, train_c, test_a, test_c
+
+
+# 6. Train and test the model, store the accuracy and loss per iteration
+
+def hype_grid():
+    learning_rates = [0.0001, 0.001, 0.003, 0.05, 0.03]
+    dropout_rates = [0.1, 0.2, 0.3, 0.6, 0.8]
+
+    for learning_rate in learning_rates:
+        for dropout_rate in dropout_rates:
+            print(
+                "Trying following " + str(learning_rate) + " learning rate and " + str(dropout_rate) + ' dropout rate')
+            test_accuracy = main(learning_rate, dropout_rate)
+            print('Test accuracy ' + str(test_accuracy[-1]))
+
+
+def hype_random(worker_num):
+    learning_rates = np.random.uniform(0.0001, 0.03, 10).tolist()
+    dropout_rates = np.random.uniform(0.1, 0.8, 10).tolist()
+
+    result_file = "/home/limmen/workspace/scala/ID2223-Scalable-ML/lab2/fashon_mnist_tf/task6/results/" + str(worker_num) + "_results.txt"
+    with open(result_file, "w") as f:
+        f.write("Results for: " + str(worker_num) + "\n")
+        f.close()
+
+    for learning_rate in learning_rates:
+        for dropout_rate in dropout_rates:
+            print(
+                "Trying following " + str(learning_rate) + " learning rate and " + str(dropout_rate) + ' dropout rate')
+            test_accuracy = main(learning_rate, dropout_rate)
+            print('Test accuracy ' + str(test_accuracy[-1]))
+            with open(result_file, "a") as f:
+                f.write("Learning rate: " + str(learning_rate) + " dropout rate: " + str(dropout_rate) +"Test accuracy " + str(test_accuracy[-1]) + "\n")
+                f.close()
+
+
+def main(learning_rate, dropout_rate):
+    # load data
+    mnist = input_data.read_data_sets(
+        '/home/limmen/workspace/scala/ID2223-Scalable-ML/lab2/fashon_mnist_tf/data/fashion', one_hot=True,
+        validation_size=0)
+    print('Number of train examples in dataset ' + str(len(mnist.train.labels)))
+    print('Number of test examples in dataset ' + str(len(mnist.test.labels)))
     train_accuracy = []
     train_cost = []
     test_accuracy = []
     test_cost = []
 
-    NUM_TRAINING_ITER = 1000
-    NUM_EPOCH_SIZE = 100
+    images, labels = define_placeholders()
+    logits = build_graph(images, dropout_rate)
+    training_step_tf, accuracy, cross_entropy_loss = define_optimizer(learning_rate, logits, labels)
+    sess = init_graph()
+
     for i in range(NUM_TRAINING_ITER):
         test = False
         if i % NUM_EPOCH_SIZE == 0:
             test = True
-            print("iter: " + str(i))
-        a, c, ta, tc = training_step(i, test, test)
+            # print("iter: " + str(i))
+        a, c, ta, tc = training_step(test, test, images, labels, training_step_tf, accuracy, cross_entropy_loss, sess, mnist)
         train_accuracy += a
         train_cost += c
         test_accuracy += ta
         test_cost += tc
 
+    sess.close()
+
+    return test_accuracy
+
+
+def plot(train_accuracy, train_cost, test_accuracy, test_cost):
     # 7. Plot and visualise the accuracy and loss
 
     print('Final test accuracy ' + str(test_accuracy[-1]))
     print('Final test loss ' + str(test_cost[-1]))
 
-    # # accuracy training vs testing dataset
+    # accuracy training vs testing dataset
     plt.plot(train_accuracy, label='Train data')
     plt.xlabel('Epoch')
     plt.plot(test_accuracy, label='Test data')
@@ -254,17 +309,26 @@ def main_fun(argv, ctx):
     plt.show()
 
 
+def main_fun(argv, ctx):
+    worker_num = ctx.worker_num
+    job_name = ctx.job_name
+    print(f"Starting worker {worker_num} on task {job_name}")
+    hype_random(worker_num)
+
+
 if __name__ == '__main__':
     # tf.app.run()
     import argparse
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--tensorboard", help="launch tensorboard process", action="store_true")
     args, rem = parser.parse_known_args()
 
     sc = SparkContext(conf=SparkConf().setAppName("lab4_task6"))
-    #num_executors = int(sc._conf.get("spark.executor.instances"))
+    # num_executors = int(sc._conf.get("spark.executor.instances"))
     num_ps = 1
+    num_workers=4
     tensorboard = True
 
-    cluster = TFCluster.run(sc, main_fun, [], 2, num_ps, tensorboard, TFCluster.InputMode.TENSORFLOW)
+    cluster = TFCluster.run(sc, main_fun, [], num_workers, num_ps, tensorboard, TFCluster.InputMode.TENSORFLOW)
     cluster.shutdown()

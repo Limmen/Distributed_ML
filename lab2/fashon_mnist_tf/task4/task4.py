@@ -1,5 +1,14 @@
-# Task 4 - Feed-Forward NN with 4 layers
+# Task 4 - Convolutional Layer with 3 Conv layers + 1 FCC/RELU + Softmax
 # 1. See results in stats.txt
+# Results indicate that adam was better than GD, and that adam with decay peformed best,
+# once again we actually got a bit worse accuracy when adding dropout regularization (pre-tuning),
+# but not as much this time, it was nearly the same result. This is slighly surprising since we see that there is some
+# overfitting so it should be possible to increase the test accuracy a bit.
+# When we used dropout the overfitting was less but it also gave slightly smaller accuracy (undefitting)
+# We use SAME padding so when stride is 1 , no matter the patch size the padding will make it
+# so that the input keeps its dimensions. Thus in our case the input dimensions are transformed as:
+# 1x28x28 -> 4x28x28 -> 8x14x14 -> 12x7x7 -> 588 -> 10
+# The downsampling is due to stride > 1, and the FCC flattens the dimensions and softmax squashes it to 10 probabilities.
 
 from __future__ import print_function
 

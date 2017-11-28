@@ -1,5 +1,10 @@
 # Task 3 - Regularization and Tuning of Hyperparams (FF-NN-4)
-# 1. See results in stats.txt
+# 1. See results in stats.txt.
+# We did not do any heavy tuning of the hyperparameters but found a
+# good setting for learning rate decay that improved the results for the gradient descent optimizer,
+# furthermore we found that dropout did not help much, or we did not find good values for dropout,
+# we should use grid search of random search to find better values because dropout in this case actually
+# reduced the accuracy, which indicates underfitting.
 # 2. Learning rate decay can counter gradient oscillations.
 # the effect is that the learning takes large steps in beginning towards the minimum,
 # and if the gradients are a bit noisy it will avoid wandering far off the minima since

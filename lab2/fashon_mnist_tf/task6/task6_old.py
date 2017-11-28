@@ -4,7 +4,6 @@ from __future__ import print_function
 import tensorflow as tf
 # to visualize the resutls
 import matplotlib.pyplot as plt
-import pandas as pd
 from pyspark.context import SparkContext
 from pyspark.conf import SparkConf
 from tensorflowonspark import TFCluster, TFNode

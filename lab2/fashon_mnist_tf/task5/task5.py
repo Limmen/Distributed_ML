@@ -1,5 +1,15 @@
-# Task 4 - Feed-Forward NN with 4 layers
-# 1. See results in stats.txt
+# Task 5 - Hyperparameter tuning
+# See results in hype.txt
+# We implemented both grid search and random search and used the random search for a reasonably long search
+# for the best hyperparameters. Due to time and compute limitations we were a bit constrained in our tuning,
+# we focused on tuning the initial learning rate for Adam optimizer as we have seen adam to be
+# consistently better than Gradient descent and to tune dropout rate only for the final layer as we have
+# seen too much underfitting when using dropout in all layers.
+# The method of grid search is to do a brute-force search on a grid for all possible parameter combinations,
+# and finally the parameter combination that gave the best result on the validation-dataset
+# is returned. Randomised search is a stochastic procedure, where hyper-parameters are
+# sampled from some specified distribution. After a certain amount of sampling the best
+# set of parameters are returned.
 
 from __future__ import print_function
 
@@ -142,7 +152,7 @@ def define_optimizer(learning_rate, logits, labels):
     # 5. Train with an Optimizer
 
     # task 1
-    train_step = tf.train.GradientDescentOptimizer(GD_LEARNING_RATE).minimize(cross_entropy_loss)
+    #train_step = tf.train.GradientDescentOptimizer(GD_LEARNING_RATE).minimize(cross_entropy_loss)
 
     # task 2
     #train_step = tf.train.AdamOptimizer(ADAM_LEARNING_RATE).minimize(cross_entropy_loss)
@@ -152,7 +162,6 @@ def define_optimizer(learning_rate, logits, labels):
     #train_step = tf.train.GradientDescentOptimizer(learning_rate).minimize(cross_entropy_loss, global_step=global_step)
 
     return train_step, accuracy, cross_entropy_loss
-
 
 def init_graph():
     # initialize and run start operation

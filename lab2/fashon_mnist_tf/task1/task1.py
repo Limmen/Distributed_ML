@@ -1,5 +1,11 @@
 # Task 1 - Softmax Regression without regularization
 # See results in stats.txt
+# Results were about 0.82, the plots show a little bit of overfitting but not too bad.
+# The model is not so powerful so that is probably why it did not overfit despite noy using any regularization.
+# It performed a little bit better with Adam which adapts the learning rate (momentum can increase convergence and
+# adaptive learning rate can adjust to not overshoot mimimas).
+# Adam needed much smaller learning rate than GD to not oscillate, this is probably due to momentum increasing the
+# learning rate to fast in the beginning if the initial learning rate is too high
 from __future__ import print_function
 # all tensorflow api is accessible through this
 import tensorflow as tf
@@ -16,7 +22,7 @@ IMAGE_SIZE = 28
 IMAGE_PIXELS = IMAGE_SIZE * IMAGE_SIZE
 NUM_CLASSES = 10
 GD_LEARNING_RATE = 0.5
-ADAM_LEARNING_RATE = 0.05
+ADAM_LEARNING_RATE = 0.005
 BATCH_SIZE = 100
 
 # load data
@@ -34,10 +40,12 @@ y_ = tf.placeholder(tf.float32, [None, NUM_CLASSES])  # correct answers(labels)
 W = tf.Variable(tf.zeros([IMAGE_PIXELS, NUM_CLASSES]))  # weights W[784, 10], 784=28*28
 b = tf.Variable(tf.zeros([NUM_CLASSES]))  # biases b[10]
 
+# XX is the design matrix [TRAINING_SAMPLES, FEATUREVECTOR]
 XX = tf.reshape(X, [-1, IMAGE_PIXELS])  # flatten the images into a single vector of pixels (1D input, not 2D)
 
 # 2. Define the model - compute predictions
 # Softmax is the activation function --> softmax regression (generalization of logistic regression to multi-class classification)
+# softmax(X*W + b)
 y = tf.nn.softmax(tf.matmul(XX, W) + b)
 
 # 3. Define the loss function
@@ -52,8 +60,9 @@ correct_predictions = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
 accuracy = tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
 
 # 5. Train with an Optimizer
-train_step = tf.train.GradientDescentOptimizer(GD_LEARNING_RATE).minimize(cross_entropy)
-#train_step = tf.train.AdamOptimizer(ADAM_LEARNING_RATE).minimize(cross_entropy)
+#train_step = tf.train.GradientDescentOptimizer(GD_LEARNING_RATE).minimize(cross_entropy)
+train_step = tf.train.AdamOptimizer(ADAM_LEARNING_RATE).minimize(cross_entropy)
+#train_step = tf.train.AdamOptimizer(0.0005).minimize(cross_entropy)
 
 # initialize variables, init is a starting operation that consumes tensors as input.
 init = tf.global_variables_initializer()

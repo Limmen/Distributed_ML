@@ -1,5 +1,6 @@
 # Task 2 - Feed-Forward NN with 4 layers
-# 1. See results in stats.txt
+# 1. See results in stats.txt, A bit more overfitting in this task since the model is more powerful.
+# We got better accuracy with ReLU, they had about the same overfitting but ReLU was just higher accuracy overall.
 # 2. ReLU gives faster convergence than sigmoid.
 # Reasons: sigmoid is more likely to suffer vanishing gradient (saturates when activation is close to 1 or -1)
 # sigmoid smaller derivative over all. ReLU higher derivative (can be a problem if it is too high though)
@@ -11,9 +12,9 @@
 # 4. Yes, in terms of accuracy we can see it sometimes dropping in both training and test data,
 # this might indicate that it overshoot a local minima, either due to learning rate being too high, or
 # because the approximate gradient (SGD) was not correct. Sometimes the accuracy drop in both.
-# Sometimes accuracy drop in only test-data, that indicates overfitting. Sometimes accuracy drop in
-# training data only, that might indicate that it was a training-batch very different from the
-# previous batches and also different than the test-data.
+# Sometimes accuracy drop in only test-data, that indicates overfitting and can be improved with regularization.
+# Sometimes accuracy drop in training data only, that might indicate that it was
+# a training-batch very different from the previous batches and also different than the test-data.
 # The same phenomena can  be observed on the loss-plot (loss increase rather than accuracy decrease)
 
 from __future__ import print_function
