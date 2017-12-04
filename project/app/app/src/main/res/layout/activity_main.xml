@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  >
+
+  <TableLayout
+    android:layout_width="368dp"
+    android:layout_height="wrap_content"
+    android:shrinkColumns="*"
+    android:stretchColumns="*"
+    tools:layout_editor_absoluteX="8dp"
+    tools:layout_editor_absoluteY="8dp"
+    android:id="@+id/tableLayout2">
+
+    <TableRow
+      android:id="@+id/title_row"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:padding="10dp"
+      android:textAlignment="center"
+      tools:layout_editor_absoluteX="8dp"
+      tools:layout_editor_absoluteY="8dp">
+
+      <TextView
+        android:id="@+id/title"
+        android:layout_weight="1"
+        android:text="@string/activity"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        android:textStyle="bold|italic" />
+
+      <TextView
+        android:id="@+id/textView"
+        android:layout_weight="1"
+        android:text="@string/probability"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        android:textStyle="bold|italic" />
+    </TableRow>
+
+    <TableRow
+      android:id="@+id/biking_row"
+      android:layout_width="fill_parent"
+      android:padding="10dp">
+
+      <TextView
+        android:id="@+id/biking_title"
+        android:layout_weight="1"
+        android:text="@string/biking"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+      <TextView
+        android:id="@+id/biking_prob"
+        android:layout_weight="1"
+        android:textAlignment="center"
+        android:textSize="18sp" />
+    </TableRow>
+
+    <TableRow
+      android:id="@+id/sitting_row"
+      android:layout_width="fill_parent"
+      android:padding="10dp">
+
+      <TextView
+        android:id="@+id/sitting_title"
+        android:layout_weight="1"
+        android:text="@string/sitting"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+      <TextView
+        android:id="@+id/sitting_prob"
+        android:layout_weight="1"
+        android:textAlignment="center"
+        android:textSize="18sp" />
+    </TableRow>
+
+    <TableRow
+      android:id="@+id/standing_row"
+      android:layout_width="fill_parent"
+      android:padding="10dp">
+
+      <TextView
+        android:id="@+id/standing_title"
+        android:layout_weight="1"
+        android:text="@string/standing"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+      <TextView
+        android:id="@+id/standing_prob"
+        android:layout_weight="1"
+        android:textAlignment="center"
+        android:textSize="18sp" />
+    </TableRow>
+
+    <TableRow
+      android:id="@+id/walking_row"
+      android:layout_width="fill_parent"
+      android:padding="10dp">
+
+      <TextView
+        android:id="@+id/walking_title"
+        android:layout_weight="1"
+        android:text="@string/walking"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+      <TextView
+        android:id="@+id/walking_prob"
+        android:layout_weight="1"
+        android:textAlignment="center"
+        android:textSize="18sp" />
+    </TableRow>
+
+    <TableRow
+      android:id="@+id/stair_up_row"
+      android:layout_width="fill_parent"
+      android:padding="10dp">
+
+      <TextView
+        android:id="@+id/stair_up_title"
+        android:layout_weight="1"
+        android:text="@string/stair_up"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+      <TextView
+        android:id="@+id/stair_up_prob"
+        android:layout_weight="1"
+        android:textAlignment="center"
+        android:textSize="18sp" />
+    </TableRow>
+
+    <TableRow
+      android:id="@+id/stair_down_row"
+      android:layout_width="fill_parent"
+      android:padding="10dp">
+
+      <TextView
+        android:id="@+id/stair_down_title"
+        android:layout_weight="1"
+        android:text="@string/stair_down"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+      <TextView
+        android:id="@+id/stair_down_prob"
+        android:layout_weight="1"
+        android:textAlignment="center"
+        android:textSize="18sp" />
+    </TableRow>
+  </TableLayout>
+
+  <TextView
+    android:id="@+id/textView3"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_below="@+id/tableLayout2"
+    android:layout_centerHorizontal="true"
+    android:layout_marginTop="85dp"
+    android:text="Current prediction"
+    android:textAppearance="@android:style/TextAppearance.Material.Large" />
+
+  <TextView
+    android:id="@+id/current_prediction"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_below="@+id/textView3"
+    android:layout_centerHorizontal="true"
+    android:layout_marginTop="75dp"
+    android:textAppearance="@android:style/TextAppearance.Material.Headline"
+    android:textStyle="bold" />
+
+</RelativeLayout>
