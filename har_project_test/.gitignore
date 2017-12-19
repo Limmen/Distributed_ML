@@ -1,7 +1,0 @@
-cleaned_data/*
-spark_warehouse/*
-data/*
-saved_model/*
-predictions/*
-__pycache__/*
-spark-warehouse*
