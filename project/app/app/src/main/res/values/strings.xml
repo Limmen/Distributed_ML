@@ -8,4 +8,5 @@
   <string name="walking">Walking</string>
   <string name="stair_up">Stair Up</string>
   <string name="stair_down">Stair Down</string>
+  <string name="other">Other Activity</string>
 </resources>

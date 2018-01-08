@@ -19,7 +19,7 @@ import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener, TextToSpeech.OnInitListener {
 
-  private static final int N_SAMPLES = 100;
+  private static final int N_SAMPLES = 200;
   private static List<Float> x;
   private static List<Float> y;
   private static List<Float> z;
@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
   private float[] results;
   private ActivityInference classifier;
 
-  private String[] labels = {"Sitting", "Standing", "Stair up", "Walking", "Biking", "Stair down"};
+  private String[] labels = {"Stair up", "Sitting", "Standing", "Walking", "Biking", "Stair down"};
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     walkingTextView = (TextView) findViewById(R.id.walking_prob);
     stairuUPTextView = (TextView) findViewById(R.id.stair_up_prob);
     stairDownTextView = (TextView) findViewById(R.id.stair_down_prob);
+
 
     classifier = new ActivityInference(getApplicationContext());
 
@@ -112,12 +113,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
       results = classifier.getActivityProbabilities(toFloatArray(data));
 
-      bikingTextView.setText(Float.toString(round(results[0], 2)));
-      stairuUPTextView.setText(Float.toString(round(results[1], 2)));
-      sittingTextView.setText(Float.toString(round(results[2], 2)));
-      standingTextView.setText(Float.toString(round(results[3], 2)));
-      stairDownTextView.setText(Float.toString(round(results[4], 2)));
-      walkingTextView.setText(Float.toString(round(results[5], 2)));
+      stairuUPTextView.setText(Float.toString(round(results[0], 2)));
+      sittingTextView.setText(Float.toString(round(results[1], 2)));
+      standingTextView.setText(Float.toString(round(results[2], 2)));
+      walkingTextView.setText(Float.toString(round(results[3], 2)));
+      bikingTextView.setText(Float.toString(round(results[4], 2)));
+      stairDownTextView.setText(Float.toString(round(results[5], 2)));
 
       x.clear();
       y.clear();

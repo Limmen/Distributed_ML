@@ -21,10 +21,10 @@ public class ActivityInference {
   // Output node name, the one that computes softmax activation on logits
   private final static String OUTPUT_NODE_NAME = "y_";
   // Input size, num_examples x num_features
-  private final static long[] INPUT_SIZE = {1, 100, 3};
+  private final static long[] INPUT_SIZE = {1, 200, 3};
   private static final String[] OUTPUT_NODES = {"y_"};
   // Output size, number of target labels
-  private final static int NUM_OUTPUT_CLASSSES = 7;
+  private final static int NUM_OUTPUT_CLASSSES = 6;
 
   public ActivityInference(final Context context){
     mInferenceInterface = new TensorFlowInferenceInterface(context.getAssets(), PATH_TO_MODEL);
