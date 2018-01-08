@@ -1,0 +1,6 @@
+stairsup,0
+sit,1
+stand,2
+walk,3
+bike,4
+stairsdown,5
